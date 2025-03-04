@@ -13,7 +13,7 @@ export const jsonFetch = async (url, options)=>{
 }
 
 export function createCachedJsonFetcher({ cache={}, rateLimit=null, onUpdateCache=_=>0, urlNormalizer=_=>_, lastFetchTime=new Date() }={}) {
-    async function cachedFetcher(url, options, {cache, onUpdateCache=_=>0,}={}) {
+    async function cachedFetcher(url, options, {onUpdateCache=_=>0,}={}) {
         const cache = cachedFetcher.cache
         url = urlNormalizer(url)
         if (!cache[url]) {
@@ -21,7 +21,7 @@ export function createCachedJsonFetcher({ cache={}, rateLimit=null, onUpdateCach
             if (cachedFetcher.rateLimit!=null) {
                 do {
                     // avoid hitting rate limit
-                    const thresholdTime = cachedFetcher.lastFetchTime.getTime() + cachedFetcher.waitTime
+                    const thresholdTime = cachedFetcher.lastFetchTime.getTime() + cachedFetcher.rateLimit
                     const now = new Date().getTime()
                     needToWait = thresholdTime - now
                     if (needToWait > 0) {
@@ -46,7 +46,7 @@ export function createCachedJsonFetcher({ cache={}, rateLimit=null, onUpdateCach
     Object.assign(cachedFetcher,{
         cache,
         lastFetchTime,
-        waitTime,
+        rateLimit,
     })
     return cachedFetcher
 }

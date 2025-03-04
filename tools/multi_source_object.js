@@ -26,6 +26,7 @@ export function MultiSourceObject(sources) {
                     return Reflect.get(value, key, ...args)
                 }
             }
+            return Object.getPrototypeOf(proxyObject)[key]
         },
         set(original, key, ...args) {
             if (key == "$accordingTo" || typeof key != "string") {

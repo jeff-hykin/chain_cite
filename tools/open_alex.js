@@ -9,10 +9,11 @@ import { createCachedJsonFetcher } from "./fetch_tools.js"
 
 export const openAlexFetch = createCachedJsonFetcher({
     rateLimit: 1000, // according to their website openAlex rate limit is once per second, and 1000 per day
-    urlNormalizer=url=>url.replace("https://openalex.org","https://api.openalex.org"),
+    urlNormalizer: url=>url.replace("https://openalex.org","https://api.openalex.org"),
 }) 
 
 export function openAlexDataFromDoi(doi) {
+    doi = doi.replace(/^https:\/\/doi\.org\//,"")
     // {
     //     id: "https://openalex.org/W4383108856",
     //     doi: "https://doi.org/10.1109/icra48891.2023.10161288",
