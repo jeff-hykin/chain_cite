@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <head>
-    <title>Web Template</title>
+    <title>Chain Cite</title>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="https://unpkg.com/css-baseline/css/3.css">
@@ -40,9 +40,6 @@
             --decent-color-21: cadetblue;
             --decent-color-22: darkorchid;
             --decent-color-23: blueviolet;
-        }
-        * {
-            min-width: 0;
         }
         body {
             font-size: 0.9em;
@@ -84,6 +81,9 @@
         </div>
     </body>
     <script>
+        // 
+        // Synchonous/Fast loading animation
+        // 
         const animateLoader = ()=>{
             const element = document.getElementById("good-component--initial-loader")
             element && element.animate(
