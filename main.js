@@ -1,4 +1,4 @@
-    // import { Elemental, passAlongProps } from "https://esm.sh/gh/jeff-hykin/elemental@0.6.4/main/deno.js"
+    import { Elemental, passAlongProps } from "https://esm.sh/gh/jeff-hykin/elemental@0.6.5/main/deno.js"
     // import { css, components, Column, Row, askForFiles, Code, Input, Button, Checkbox, Dropdown, popUp, cx, } from "https://esm.sh/gh/jeff-hykin/good-component@0.3.0/elements.js"
     // import { fadeIn, fadeOut } from "https://esm.sh/gh/jeff-hykin/good-component@0.3.0/main/animations.js"
     // import { showToast } from "https://esm.sh/gh/jeff-hykin/good-component@0.3.0/main/actions.js"
@@ -20,6 +20,7 @@
     //         </Column>
     //     </body>
     // `
+    import { getRelatedArticles } from "./open_alex.js"
 
 // 
 // 
@@ -40,198 +41,14 @@
 // 
 // 
     import router from "https://esm.sh/gh/jeff-hykin/quik-router@4f1164a/main/main.js?dev"
-    import { Elemental } from "https://deno.land/x/elementalist@0.5.34/main/deno.js?code"
     import { css, components, Column, Row, askForFiles, Code, Input, Button, Checkbox, Dropdown, popUp, cx, } from "https://deno.land/x/good_component@0.2.7/elements.js"
     import { fadeIn, fadeOut } from "https://deno.land/x/good_component@0.2.7/main/animations.js"
     import { showToast } from "https://deno.land/x/good_component@0.2.7/main/actions.js"
     import { addDynamicStyleFlags, setupStyles, createCssClass, setupClassStyles, hoverStyleHelper, combineClasses, mergeStyles, AfterSilent, removeAllChildElements } from "https://deno.land/x/good_component@0.2.7/main/helpers.js"
     import storageObject from "https://deno.land/x/storage_object@0.0.2.0/main.js"
     import { zip, enumerate, count, permute, combinations, wrapAroundGet } from "https://deno.land/x/good@1.5.1.0/array.js"
-    // const ContainerLibrary = (await import("https://cdn.skypack.dev/@!vanilla/container@v1.0.5")).default
-    // inlined version of what is above
-        const htmlEventHandlers = new Set(['onabort', 'onanimationcancel', 'onanimationend', 'onanimationiteration', 'onanimationstart', 'onauxclick', 'onblur', 'onerror', 'onfocus', 'oncancel', 'oncanplay', 'oncanplaythrough', 'onchange', 'onclick', 'onclose', 'oncontextmenu', 'oncuechange', 'ondblclick', 'ondrag', 'ondragend', 'ondragenter', 'ondragleave', 'ondragover', 'ondragstart', 'ondrop', 'ondurationchange', 'onemptied', 'onended', 'onformdata', 'ongotpointercapture', 'oninput', 'oninvalid', 'onkeydown', 'onkeypress', 'onkeyup', 'onload', 'onloadeddata', 'onloadedmetadata', 'onloadend', 'onloadstart', 'onlostpointercapture', 'onmousedown', 'onmouseenter', 'onmouseleave', 'onmousemove', 'onmouseout', 'onmouseover', 'onmouseup', 'onmousewheel', 'onwheel', 'onpause', 'onplay', 'onplaying', 'onpointerdown', 'onpointermove', 'onpointerup', 'onpointercancel', 'onpointerover', 'onpointerout', 'onpointerenter', 'onpointerleave', 'onpointerlockchange', 'onpointerlockerror', 'onprogress', 'onratechange', 'onreset', 'onresize', 'onscroll', 'onsecuritypolicyviolation', 'onseeked', 'onseeking', 'onselect', 'onselectstart', 'onselectionchange', 'onshow', 'onslotchange', 'onstalled', 'onsubmit', 'onsuspend', 'ontimeupdate', 'onvolumechange', 'ontouchcancel', 'ontouchend', 'ontouchmove', 'ontouchstart', 'ontransitioncancel', 'ontransitionend', 'ontransitionrun', 'ontransitionstart', 'onwaiting', ])
-        const fixedAttributes = new Set(['accept', 'accept-charset', 'accesskey', 'action', 'align', 'allow', 'alt', 'async', 'autocapitalize', 'autocomplete', 'autofocus', 'autoplay', 'background', 'bgcolor', 'border', 'buffered', 'capture', 'challenge', 'charset', 'checked', 'cite', 'class', 'code', 'codebase', 'color', 'cols', 'colspan', 'content', 'contenteditable', 'contextmenu', 'controls', 'coords', 'crossorigin', 'csp', 'data', 'datetime', 'decoding', 'default', 'defer', 'dir', 'dirname', 'disabled', 'download', 'draggable', 'enctype', 'enterkeyhint', 'for', 'form', 'formaction', 'formenctype', 'formmethod', 'formnovalidate', 'formtarget', 'headers', 'height', 'hidden', 'high', 'href', 'hreflang', 'http-equiv', 'icon', 'id', 'importance', 'integrity', 'intrinsicsize', 'inputmode', 'ismap', 'itemprop', 'keytype', 'kind', 'label', 'lang', 'language', 'loading', 'list', 'loop', 'low', 'manifest', 'max', 'maxlength', 'minlength', 'media', 'method', 'min', 'multiple', 'muted', 'name', 'novalidate', 'open', 'optimum', 'pattern', 'ping', 'placeholder', 'poster', 'preload', 'radiogroup', 'readonly', 'referrerpolicy', 'rel', 'required', 'reversed', 'rows', 'rowspan', 'sandbox', 'scope', 'scoped', 'selected', 'shape', 'size', 'sizes', 'slot', 'span', 'spellcheck', 'src', 'srcdoc', 'srclang', 'srcset', 'start', 'step', 'style', 'summary', 'tabindex', 'target', 'title', 'translate', 'type', 'usemap', 'value', 'width', 'wrap', ...htmlEventHandlers]) 
-        const isAnHtmlAttribute = (string) => {
-            if (fixedAttributes.has(string)) {
-                return true
-            } else if (string.startsWith('data-')) {
-                return true
-            }
-            return false
-        }
-        
-        const cssHmtlOverlap = new Set(['width', 'height', 'background', 'border', 'color'])
-        const splitHtmlCssAttributes = (object)=> {
-            const htmlAttributes = {}
-            const cssAttributes = {}
-            for (const [key, value] of Object.entries(object)) {
-                if (cssHmtlOverlap.has(key)) {
-                    htmlAttributes[key] = value
-                    cssAttributes[key] = value
-                } else if (isAnHtmlAttribute(key)) {
-                    htmlAttributes[key] = value
-                } else {
-                    cssAttributes[key] = value
-                }
-            }
-            return [htmlAttributes, cssAttributes]
-        }
-
-        const computeDirection = (row, column, reverse) => {
-            const output = row ? 'row' : 'column'
-            if (!reverse) {
-                return output
-            } else {
-                return `${output}-reverse`
-            }
-        }
-
-        const humanPositionToCssPosition = (humanPosition) => {
-            if (humanPosition === 'relativeToParent') {
-                return 'absolute'
-            } else if (humanPosition === 'relativeToSelf') {
-                return 'relative'
-            } else if (humanPosition === 'relativeToWindow') {
-                return 'fixed'
-            } else if (humanPosition === 'sticky') {
-                return 'sticky'
-            } else if (typeof humanPosition === 'string') {
-                console.warn(`positionSelf needs to be one of [ 'relativeToParent', 'relativeToSelf', 'relativeToWindow', 'sticky' ]\nbut instead it was: '${humanPosition}'`)
-            }
-            return undefined
-        }
-
-        const humanPositionToCssFlexbox = (humanWord) => {
-            if (humanWord.match(/^(top|left)$/i)) {
-                return 'flex-start'
-            } else if (humanWord.match(/^(bottom|right)$/i)) {
-                return 'flex-end'
-            } else {
-                return humanWord
-            }
-        }
-
-        const columnAlignment = (horizontalAlignment, verticalAlignment, innerAlignment, wrap) => {
-            if (!wrap) {
-                return {
-                    justifyContent: verticalAlignment,
-                    alignItems: horizontalAlignment,
-                }
-            } else {
-                return {
-                    // still just vertical space between
-                    justifyContent: verticalAlignment,
-                    // when wrapped this becomes the inner item alignment
-                    alignItems: innerAlignment,
-                    // when wrapped this becomes the horizontal space between
-                    alignContent: horizontalAlignment,
-                }
-            }
-        }
-
-        const rowAlignment = (horizontalAlignment, verticalAlignment, innerAlignment, wrap) => {
-            if (!wrap) {
-                return {
-                    justifyContent: horizontalAlignment,
-                    alignItems: verticalAlignment,
-                }
-            } else {
-                return {
-                    // still just horizontal space between
-                    justifyContent: horizontalAlignment,
-                    // when wrapped this becomes the inner item alignment
-                    alignItems: innerAlignment,
-                    // when wrapped this becomes the vertical space between
-                    alignContent: verticalAlignment,
-                }
-            }
-        }
-
-        const computeFlexAlignmentAttributes = (directionIsRow, horizontalAlignment, verticalAlignment, innerAlignment, wrap) => {
-            // convert to css form
-            horizontalAlignment = humanPositionToCssFlexbox(horizontalAlignment)
-            verticalAlignment = humanPositionToCssFlexbox(verticalAlignment)
-            // then pick the correct one
-            if (directionIsRow) {
-                return rowAlignment(horizontalAlignment, verticalAlignment, innerAlignment, wrap)
-            } else {
-                return columnAlignment(horizontalAlignment, verticalAlignment, innerAlignment, wrap)
-            }
-        }
-
-        const setProperties = (element, properties)=>{
-            for (const [key, value] of Object.entries(properties)) {
-                try {
-                    const kebabCase = key.replace(/(?<=[a-z])([A-Z])(?=[a-z])/g, (each)=>`-${each.toLowerCase()}`)
-                    element.setAttribute(kebabCase, value)
-                } catch (error) {
-                }
-                element[key] = value
-            }
-        }
-
-        const elementSymbol = Symbol.for("element")
-        function appendChildren(element, ...children) {
-            for (const each of children) {
-                if (typeof each == 'string') {
-                    element.appendChild(new window.Text(each))
-                } else if (each == null) {
-                    // empty node
-                    element.appendChild(new window.Text(""))
-                } else if (!(each instanceof Object)) {
-                    element.appendChild(new window.Text(`${each}`))
-                } else if (each[elementSymbol]) {
-                    element.appendChild(each[elementSymbol])
-                } else if (each instanceof Node) {
-                    element.appendChild(each)
-                } else if (each instanceof Array) {
-                    appendChildren(element, ...each)
-                } else if (each instanceof Function) {
-                    // recursively
-                    appendChildren(element, each())
-                } else if (each instanceof Promise) {
-                    const elementPromise = each
-                    const placeholder = elementPromise.placeholder || document.createElement("div")
-                    setTimeout(async () => placeholder.replaceWith(await elementPromise), 0)
-                    element.appendChild(placeholder)
-                // some elements are not HTML nodes and are still valid
-                } else if (each != null && each instanceof Object) {
-                    element.appendChild(each)
-                }
-            }
-            return element
-        }
-
-        const ContainerLibrary = ({ row, column, reverse, wrap, positionSelf='relativeToSelf', verticalAlignment='top', horizontalAlignment='left', innerAlignment='center', textWrapAlignment, children, ...props })=>{
-            const [htmlAttributes, cssAttributes] = splitHtmlCssAttributes(props)
-            const element = document.createElement("div")
-            // 
-            // style
-            // 
-            Object.assign(element.style, {
-                position: humanPositionToCssPosition(positionSelf) || 'relative',
-                display: 'flex',
-                flexDirection: computeDirection(row, column, reverse),
-                flexWrap: wrap === 'reverse' ? 'wrap-reverse' : (wrap&&'wrap'),
-                // text-align (effects how text will look when wrapped)
-                textAlign: textWrapAlignment || horizontalAlignment,
-                // handle the justifyContent/alignContent attributes
-                ...computeFlexAlignmentAttributes(
-                    row,
-                    horizontalAlignment,
-                    verticalAlignment,
-                    innerAlignment,
-                    wrap,
-                ),
-                ...cssAttributes,
-            })
-            // 
-            // attributes
-            // 
-            setProperties(element, {name: "positioner", ...htmlAttributes})
-            appendChildren(element, children)
-            return element
-        }
+    import { ContainerLibrary } from "./container_library.js"
+    
     const nullFunc = ()=>0
     const addDynamicStylerFlags = (element, flagKeys) => {
         element.dynamicStyler = element.dynamicStyler||nullFunc
@@ -414,48 +231,50 @@ document.body.animate(...fadeIn)
         let iframeWrapper, iframe, hoverMessageElement
         const summary = html`
             <Container name=summary display=relative width=100% gap=1.4rem display=flex overflow=visible flex-grow=1 opacity=${withTempColoring?0.5:1}>
-                <span style="color: #FFFFFF22;">DOI: ${nodeData.DOI}</span>
-                ${nodeData.title&&html`<h4 style="color: white;font-size: 1.5em;" innerHTML=${nodeData.title}></h4>`}
-                ${`https://sci-hub.hkvisa.net/${nodeData.DOI}`}
-                
-                ${nodeData.authorLastName&&nodeData.yearCreated&&html`
-                    <h5>
-                        <a
-                            href=${`https://sci-hub.hkvisa.net/${nodeData.DOI}`}
-                            style="color: ${theme.foregroundDim};text-decoration: underline;font-size: 1rem;"
+                <Container name=aboveHover height=20rem max-width=100% overflow=hidden gap=1.4rem>
+                    <span style="color: #FFFFFF22;">DOI: ${nodeData.DOI}</span>
+                    ${nodeData.title&&html`<h4 style="color: white;font-size: 1.5em;" innerHTML=${nodeData.title}></h4>`}
+                    
+                    ${nodeData.authorLastName&&nodeData.yearCreated&&html`
+                        <h5>
+                            <a
+                                href=${`https://sci-hub.hkvisa.net/${nodeData.DOI}`}
+                                style="color: ${theme.foregroundDim};text-decoration: underline;font-size: 1rem;"
+                                >
+                                    ${nodeData.authorLastName}, ${nodeData.yearCreated}
+                            </a>
+                        </h5>
+                    `}
+                    <Container display=flex flex-grow=1 row horizontalAlignment=space-between width=100% verticalAlignment=center>
+                        <button
+                            style="cursor: pointer;"
+                            background="${theme.accent}"
+                            onclick=${(e)=>{
+                                e.preventDefault()
+                                let toast = showToast(`loading new nodes`, {
+                                    position: 'right',
+                                    backgroundColor: theme.accent,
+                                    color: 'white',
+                                    gravity: "bottom",
+                                    duration: 8000,
+                                })
+                                router.goTo({ path: `${Math.random()}`, doi: nodeData.id })
+                                
+                                // getNodesAndLinksFor(nodeData.id).then(loadNewGraph).then(()=>{
+                                //     showToast(`Done ✅`, {
+                                //         position: 'right',
+                                //         backgroundColor: theme.accent,
+                                //         color: 'white',
+                                //         gravity: "bottom",
+                                //         duration: 5000,
+                                //     })
+                                // })
+                            }}
                             >
-                                ${nodeData.authorLastName}, ${nodeData.yearCreated}
-                        </a>
-                    </h5>
-                `}
-                <Container display=flex flex-grow=1 row horizontalAlignment=space-between width=100% verticalAlignment=center>
-                    <button
-                        style="cursor: pointer;"
-                        background="${theme.accent}"
-                        onclick=${(e)=>{
-                            e.preventDefault()
-                            let toast = showToast(`loading new nodes`, {
-                                position: 'right',
-                                backgroundColor: theme.accent,
-                                color: 'white',
-                                gravity: "bottom",
-                                duration: 8000,
-                            })
-                            router.goTo({ path: `${Math.random()}`, doi: nodeData.id })
-                            
-                            // getNodesAndLinksFor(nodeData.id).then(loadNewGraph).then(()=>{
-                            //     showToast(`Done ✅`, {
-                            //         position: 'right',
-                            //         backgroundColor: theme.accent,
-                            //         color: 'white',
-                            //         gravity: "bottom",
-                            //         duration: 5000,
-                            //     })
-                            // })
-                        }}
-                        >
-                            Recenter on this Node
-                    </button>
+                                Recenter on this Node
+                        </button>
+                    </Container>
+                    ${`https://sci-hub.hkvisa.net/${nodeData.DOI}`}
                 </Container>
                 ${nodeData.DOI&&html`
                     ${iframeWrapper = html`
@@ -467,7 +286,7 @@ document.body.animate(...fadeIn)
                                     <iframe style="visibility: hidden;" src=${JSON.stringify(`https://sci-hub.hkvisa.net/${nodeData.DOI}`)} height=100 width=100></iframe>
                                 `}></div>`.children[0]
                             }
-                            ${hoverMessageElement = html`<Container horizontalAlignment="center" verticalAlignment=center width=100% height="100%" background-color="#00000022" position="absolute" top=0>
+                            ${hoverMessageElement = html`<Container horizontalAlignment="center" verticalAlignment=center width=100% height="90%" background-color="#00000022" position="absolute" top=0>
                                 <h5>
                                     Hover here to preview PDF
                                 </h5>
@@ -487,7 +306,7 @@ document.body.animate(...fadeIn)
                     const {top,bottom} = iframeWrapper.getBoundingClientRect()
                     const {left,right} = document.body.getBoundingClientRect()
                     iframe.setAttribute("height", (bottom-top))
-                    iframe.setAttribute("width", (right-left)*0.70)
+                    iframe.setAttribute("width", (right-left)*0.90)
                     iframeWrapper.style.backgroundColor = "whitesmoke"
                     iframeWrapper.style.minWidth = "fit-content"
                     hoverMessageElement.style.visibility = "hidden"
@@ -1336,7 +1155,6 @@ document.body.animate(...fadeIn)
      */
     function Graph({nodes, links, style={}, nodeSize=18, nodeColor=theme.accent, minZoom=0.2, maxZoom=3, onNodeClick, labelAnchor="left", labelSize="10pt", }) {
         try {
-            
             const graph = html`<div></div>`
             graph.style.display = "flexbox"
             graph.style.alignItems = "center"
@@ -1349,7 +1167,8 @@ document.body.animate(...fadeIn)
             // Object.assign(graph.style, (html`<div style=${style}></div>`).style)
             const height = window.screen.height
             const width = window.screen.width
-            const element = html`<svg height=${height} width=${width}></svg>`
+            // const element = html`<svg height=${height} width=${width}></svg>`
+            const element = html`<svg viewBox="600 -500 2000 2000" height=${height} width=${width}></svg>`
             const svg = d3.select(element)
             const nodeDataById = {}
             for (let each of nodes) {
