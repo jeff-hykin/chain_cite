@@ -21556,7 +21556,7 @@ export async function getLinkedOpenAlexArticles(openAlexId) {
     //     "group_by": []
     // }
     return {
-        citedBy: await openAlexFetch(`https://api.openalex.org/works?filter=cited_by:${openAlexId}`),
-        cites: await openAlexFetch(`https://api.openalex.org/works?filter=cites:${openAlexId}`),
+        citedBy: (await openAlexFetch(`https://api.openalex.org/works?filter=cited_by:${openAlexId}`)).results,
+        cites: (await openAlexFetch(`https://api.openalex.org/works?filter=cites:${openAlexId}`)).results,
     }
 }
