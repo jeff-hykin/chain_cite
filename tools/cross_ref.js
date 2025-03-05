@@ -1,4 +1,4 @@
-import { createCachedJsonFetcher } from "./fetch_tools.js"
+import { createCachedJsonFetcher, normalizeDoiString } from "./fetch_tools.js"
 
 export const crossRefFetch = createCachedJsonFetcher({
     rateLimit: 100, // not sure what their rate limit is
@@ -10,7 +10,7 @@ export function crossRefDataFromDoi(doi) {
     if (!(typeof doi == "string")) {
         throw Error(`crossRefDataFromDoi(doi), doi arg was not a string`, doi)
     }
-    doi = doi.replace(/^https:\/\/doi\.org\/+/,"")
+    doi = normalizeDoiString(doi)
     return (await crossRefFetch(`https://api.crossref.org/works/${doi}`)).message
     // result.DOI
     // result.abstract
@@ -664,4 +664,409 @@ export function crossRefDataFromDoi(doi) {
     //         }
     //     }
     // }
+}
+
+async function getLinkedCrossRefArticles(doi) {
+    if (!(typeof doi == "string")) {
+        throw Error(`getLinkedCrossRefArticles(doi), doi arg was not a string`, doi)
+    }
+    const crossRefObject = await crossRefDataFromDoi(doi)
+    
+    const refs = (paperInfo?.reference||[]).map(each=>each.DOI).filter(each=>each).slice(0)
+    // [
+    //     {
+    //         "issue": "4",
+    //         "key": "1",
+    //         "doi-asserted-by": "crossref",
+    //         "first-page": "141",
+    //         "DOI": "10.1080/08964280209596039",
+    //         "volume": "27",
+    //         "year": "2002",
+    //         "journal-title": "Behavioral Medicine"
+    //     },
+    //     {
+    //         "key": "2",
+    //         "doi-asserted-by": "publisher",
+    //         "DOI": "10.1016/j.brainresbull.2003.12.001"
+    //     },
+    //     {
+    //         "key": "3",
+    //         "doi-asserted-by": "publisher",
+    //         "DOI": "10.1016/S0140-6736(04)17019-0"
+    //     },
+    //     {
+    //         "key": "4",
+    //         "first-page": "1",
+    //         "volume-title": "Introduction to cardiovascular disease, stress and adaptation",
+    //         "year": "2012"
+    //     },
+    //     {
+    //         "key": "5",
+    //         "doi-asserted-by": "publisher",
+    //         "DOI": "10.1111/j.1440-1681.2008.04904.x"
+    //     },
+    //     {
+    //         "key": "6",
+    //         "first-page": "273",
+    //         "volume-title": "The causal role of chronic mental stress in the pathogenesis of essential hypertension",
+    //         "year": "2012"
+    //     },
+    //     {
+    //         "key": "7",
+    //         "doi-asserted-by": "publisher",
+    //         "DOI": "10.1186/1471-2458-8-357"
+    //     },
+    //     {
+    //         "key": "8",
+    //         "doi-asserted-by": "publisher",
+    //         "DOI": "10.1038/jhh.2008.74"
+    //     },
+    //     {
+    //         "key": "9",
+    //         "doi-asserted-by": "publisher",
+    //         "DOI": "10.1007/s10571-011-9768-0"
+    //     },
+    //     {
+    //         "issue": "4",
+    //         "key": "10",
+    //         "doi-asserted-by": "crossref",
+    //         "first-page": "1227",
+    //         "DOI": "10.1152/physrev.1999.79.4.1227",
+    //         "volume": "79",
+    //         "year": "1999",
+    //         "journal-title": "Physiological Reviews"
+    //     },
+    //     {
+    //         "key": "11",
+    //         "first-page": "S9",
+    //         "volume": "61",
+    //         "year": "2012",
+    //         "journal-title": "Physiological Research"
+    //     },
+    //     {
+    //         "key": "12",
+    //         "doi-asserted-by": "publisher",
+    //         "DOI": "10.1042/CS20050271"
+    //     },
+    //     {
+    //         "issue": "3",
+    //         "key": "13",
+    //         "first-page": "367",
+    //         "volume": "50",
+    //         "year": "1999",
+    //         "journal-title": "Journal of Physiology and Pharmacology"
+    //     },
+    //     {
+    //         "issue": "1",
+    //         "key": "14",
+    //         "first-page": "67",
+    //         "volume": "52",
+    //         "year": "2003",
+    //         "journal-title": "Physiological Research"
+    //     },
+    //     {
+    //         "key": "15",
+    //         "doi-asserted-by": "crossref",
+    //         "first-page": "331",
+    //         "volume": "16",
+    //         "year": "2013",
+    //         "journal-title": "Stress",
+    //         "DOI": "10.3109/10253890.2012.725116"
+    //     },
+    //     {
+    //         "key": "16",
+    //         "doi-asserted-by": "publisher",
+    //         "DOI": "10.1023/A:1016627224865"
+    //     },
+    //     {
+    //         "key": "17",
+    //         "doi-asserted-by": "publisher",
+    //         "DOI": "10.1007/s00424-011-1022-6"
+    //     },
+    //     {
+    //         "issue": "5",
+    //         "key": "18",
+    //         "first-page": "667",
+    //         "volume": "56",
+    //         "year": "2007",
+    //         "journal-title": "Physiological Research"
+    //     },
+    //     {
+    //         "issue": "6",
+    //         "key": "19",
+    //         "doi-asserted-by": "crossref",
+    //         "first-page": "854",
+    //         "DOI": "10.1161/01.HYP.26.6.854",
+    //         "volume": "26",
+    //         "year": "1995",
+    //         "journal-title": "Hypertension"
+    //     },
+    //     {
+    //         "key": "20",
+    //         "doi-asserted-by": "publisher",
+    //         "DOI": "10.1080/10253890802234168"
+    //     },
+    //     {
+    //         "issue": "2",
+    //         "key": "21",
+    //         "first-page": "103",
+    //         "volume": "59",
+    //         "year": "2008",
+    //         "journal-title": "Journal of Physiology and Pharmacology"
+    //     },
+    //     {
+    //         "key": "22",
+    //         "doi-asserted-by": "publisher",
+    //         "DOI": "10.1016/j.physbeh.2009.05.011"
+    //     },
+    //     {
+    //         "key": "23",
+    //         "doi-asserted-by": "publisher",
+    //         "DOI": "10.1097/01.hjh.0000358834.18311.fc"
+    //     },
+    //     {
+    //         "key": "24",
+    //         "doi-asserted-by": "publisher",
+    //         "DOI": "10.1016/S0008-6363(01)00508-9"
+    //     },
+    //     {
+    //         "key": "25",
+    //         "doi-asserted-by": "crossref",
+    //         "first-page": "897",
+    //         "volume": "2",
+    //         "year": "2010",
+    //         "journal-title": "Health",
+    //         "DOI": "10.4236/health.2010.28133"
+    //     },
+    //     {
+    //         "key": "26",
+    //         "doi-asserted-by": "publisher",
+    //         "DOI": "10.1016/j.biopsycho.2004.11.009"
+    //     },
+    //     {
+    //         "key": "27",
+    //         "doi-asserted-by": "publisher",
+    //         "DOI": "10.1007/s10517-007-0043-9"
+    //     },
+    //     {
+    //         "key": "29",
+    //         "doi-asserted-by": "publisher",
+    //         "DOI": "10.1016/j.niox.2011.12.008"
+    //     },
+    //     {
+    //         "key": "30",
+    //         "first-page": "73",
+    //         "volume-title": "Measurement of vascular reactive oxygen species production by chemiluminescence",
+    //         "year": "2005"
+    //     },
+    //     {
+    //         "issue": "4",
+    //         "key": "31",
+    //         "first-page": "405",
+    //         "volume": "13",
+    //         "year": "1995",
+    //         "journal-title": "Journal of Hypertension"
+    //     },
+    //     {
+    //         "key": "32",
+    //         "doi-asserted-by": "crossref",
+    //         "first-page": "2611",
+    //         "volume": "38",
+    //         "year": "2013",
+    //         "journal-title": "Psychoneuroendocrinology",
+    //         "DOI": "10.1016/j.psyneuen.2013.06.014"
+    //     },
+    //     {
+    //         "key": "33",
+    //         "doi-asserted-by": "publisher",
+    //         "DOI": "10.1016/j.appet.2012.02.046"
+    //     },
+    //     {
+    //         "key": "34",
+    //         "doi-asserted-by": "crossref",
+    //         "first-page": "217",
+    //         "volume": "177",
+    //         "year": "2013",
+    //         "journal-title": "Autonomic Neuroscience",
+    //         "DOI": "10.1016/j.autneu.2013.05.001"
+    //     },
+    //     {
+    //         "key": "35",
+    //         "doi-asserted-by": "crossref",
+    //         "first-page": "142",
+    //         "volume": "246",
+    //         "year": "2013",
+    //         "journal-title": "Neuroscience",
+    //         "DOI": "10.1016/j.neuroscience.2013.04.052"
+    //     },
+    //     {
+    //         "key": "36",
+    //         "doi-asserted-by": "publisher",
+    //         "DOI": "10.1186/1744-9081-7-11"
+    //     },
+    //     {
+    //         "key": "37",
+    //         "doi-asserted-by": "publisher",
+    //         "DOI": "10.1113/jphysiol.2007.141580"
+    //     },
+    //     {
+    //         "key": "38",
+    //         "doi-asserted-by": "publisher",
+    //         "DOI": "10.1016/j.nlm.2008.07.001"
+    //     },
+    //     {
+    //         "key": "39",
+    //         "doi-asserted-by": "publisher",
+    //         "DOI": "10.3109/10253890.2011.586446"
+    //     },
+    //     {
+    //         "issue": "3",
+    //         "key": "40",
+    //         "first-page": "487",
+    //         "volume": "58",
+    //         "year": "2007",
+    //         "journal-title": "Journal of Physiology and Pharmacology"
+    //     },
+    //     {
+    //         "key": "41",
+    //         "doi-asserted-by": "publisher",
+    //         "DOI": "10.1152/ajpregu.00095.2008"
+    //     },
+    //     {
+    //         "key": "42",
+    //         "doi-asserted-by": "publisher",
+    //         "DOI": "10.1113/expphysiol.2010.055970"
+    //     },
+    //     {
+    //         "issue": "5",
+    //         "key": "43",
+    //         "doi-asserted-by": "crossref",
+    //         "first-page": "R527",
+    //         "DOI": "10.1152/ajpregu.1985.249.5.R527",
+    //         "volume": "249",
+    //         "year": "1985",
+    //         "journal-title": "American Journal of Physiology—Regulatory Integrative and Comparative Physiology"
+    //     },
+    //     {
+    //         "key": "44",
+    //         "first-page": "111",
+    //         "volume": "116",
+    //         "year": "2002",
+    //         "journal-title": "Indian Journal of Medical Research"
+    //     },
+    //     {
+    //         "key": "45",
+    //         "doi-asserted-by": "publisher",
+    //         "DOI": "10.1016/0031-9384(96)00020-0"
+    //     },
+    //     {
+    //         "key": "46",
+    //         "doi-asserted-by": "publisher",
+    //         "DOI": "10.1007/s00467-011-1928-4"
+    //     },
+    //     {
+    //         "key": "47",
+    //         "doi-asserted-by": "publisher",
+    //         "DOI": "10.1155/2013/427640"
+    //     },
+    //     {
+    //         "key": "48",
+    //         "doi-asserted-by": "publisher",
+    //         "DOI": "10.1016/j.jacc.2005.03.068"
+    //     },
+    //     {
+    //         "key": "49",
+    //         "doi-asserted-by": "publisher",
+    //         "DOI": "10.1074/jbc.271.39.23928"
+    //     },
+    //     {
+    //         "key": "50",
+    //         "doi-asserted-by": "publisher",
+    //         "DOI": "10.1007/s00424-010-0797-1"
+    //     },
+    //     {
+    //         "key": "51",
+    //         "doi-asserted-by": "publisher",
+    //         "DOI": "10.1016/j.physbeh.2011.09.017"
+    //     },
+    //     {
+    //         "key": "52",
+    //         "first-page": "615",
+    //         "volume": "62",
+    //         "year": "2013",
+    //         "journal-title": "Physiological Research"
+    //     },
+    //     {
+    //         "key": "53",
+    //         "doi-asserted-by": "crossref",
+    //         "first-page": "233",
+    //         "volume": "16",
+    //         "year": "2013",
+    //         "journal-title": "Stress",
+    //         "DOI": "10.3109/10253890.2012.719052"
+    //     },
+    //     {
+    //         "issue": "1",
+    //         "key": "54",
+    //         "first-page": "53",
+    //         "volume": "46",
+    //         "year": "2009",
+    //         "journal-title": "Indian Journal of Biochemistry and Biophysics"
+    //     },
+    //     {
+    //         "key": "61",
+    //         "doi-asserted-by": "publisher",
+    //         "DOI": "10.1161/01.RES.0000082524.34487.31"
+    //     },
+    //     {
+    //         "key": "55",
+    //         "doi-asserted-by": "publisher",
+    //         "DOI": "10.1124/pr.59.3.3"
+    //     },
+    //     {
+    //         "issue": "6",
+    //         "key": "56",
+    //         "doi-asserted-by": "crossref",
+    //         "first-page": "R1719",
+    //         "DOI": "10.1152/ajpregu.2001.280.6.R1719",
+    //         "volume": "280",
+    //         "year": "2001",
+    //         "journal-title": "American Journal of Physiology—Regulatory Integrative and Comparative Physiology"
+    //     },
+    //     {
+    //         "key": "59"
+    //     },
+    //     {
+    //         "issue": "4",
+    //         "key": "60",
+    //         "doi-asserted-by": "crossref",
+    //         "first-page": "393",
+    //         "DOI": "10.1161/01.HYP.12.4.393",
+    //         "volume": "12",
+    //         "year": "1988",
+    //         "journal-title": "Hypertension"
+    //     },
+    //     {
+    //         "key": "57",
+    //         "doi-asserted-by": "crossref",
+    //         "first-page": "341",
+    //         "volume": "78",
+    //         "year": "2013",
+    //         "journal-title": "Steroids",
+    //         "DOI": "10.1016/j.steroids.2012.11.018"
+    //     },
+    //     {
+    //         "key": "58",
+    //         "doi-asserted-by": "publisher",
+    //         "DOI": "10.1097/00004872-200309000-00019"
+    //     }
+    // ]
+    if (refs.length == 0) {
+        return { cites: [] }
+    } else {
+        const refsWithDois = refs.filter(each=>each.DOI)
+        const dois = refsWithDois.map(each=>each.DOI)
+        const allRefs = await crossRefFetch(`https://api.crossref.org/works/?filter=${dois.map(eachDoi=>`doi:${eachDoi}`).join(",")}&rows=${dois.length}`)
+        return { cites: allRefs }
+    }
 }

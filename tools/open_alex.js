@@ -1,4 +1,4 @@
-import { createCachedJsonFetcher } from "./fetch_tools.js"
+import { createCachedJsonFetcher, normalizeDoiString } from "./fetch_tools.js"
 
 export const openAlexFetch = createCachedJsonFetcher({
     rateLimit: 1000, // according to their website openAlex rate limit is once per second, and 1000 per day
@@ -6,7 +6,10 @@ export const openAlexFetch = createCachedJsonFetcher({
 }) 
 
 export function openAlexDataFromDoi(doi) {
-    doi = doi.replace(/^https:\/\/doi\.org\/+/,"")
+    if (!(typeof openAlexId == "string")) {
+        throw Error(`openAlexDataFromDoi(doi), doi arg was not a string`, doi)
+    }
+    doi = normalizeDoiString(doi)
     // {
     //     id: "https://openalex.org/W4383108856",
     //     doi: "https://doi.org/10.1109/icra48891.2023.10161288",
@@ -80,8 +83,7 @@ export function openAlexDataFromDoi(doi) {
 
 export async function getLinkedOpenAlexArticles(openAlexId) {
     if (!(typeof openAlexId == "string")) {
-        console.warn(`getLinkedOpenAlexArticles(openAlexId), openAlexId arg was not a string`, openAlexId)
-        return {}
+        throw Error(`getLinkedOpenAlexArticles(openAlexId), openAlexId arg was not a string`, openAlexId)
     }
     // {
     //     "meta": {
