@@ -20,7 +20,6 @@
     //         </Column>
     //     </body>
     // `
-    import { getRelatedArticles } from "./open_alex.js"
 
 // 
 // 

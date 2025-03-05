@@ -1,10 +1,3 @@
-#!/usr/bin/env -S deno run --allow-all
-import { zip, enumerate, count, permute, combinations, wrapAroundGet } from "https://deno.land/x/good@1.13.5.0/array.js"
-import { deepCopy, deepCopySymbol, allKeyDescriptions, allKeys } from "https://deno.land/x/good@1.13.5.0/value.js"
-import DateTime from "https://deno.land/x/good@1.13.5.0/date.js"
-// import { Parser, parserFromWasm } from "https://deno.land/x/deno_tree_sitter@0.1.3.0/main.js"
-// import html from "https://github.com/jeff-hykin/common_tree_sitter_languages/raw/4d8a6d34d7f6263ff570f333cdcf5ded6be89e3d/main/html.js"
-import { toCamelCase } from "https://deno.land/x/good@1.13.5.0/flattened/to_camel_case.js"
 import { createCachedJsonFetcher } from "./fetch_tools.js"
 
 export const openAlexFetch = createCachedJsonFetcher({
@@ -13,7 +6,7 @@ export const openAlexFetch = createCachedJsonFetcher({
 }) 
 
 export function openAlexDataFromDoi(doi) {
-    doi = doi.replace(/^https:\/\/doi\.org\//,"")
+    doi = doi.replace(/^https:\/\/doi\.org\/+/,"")
     // {
     //     id: "https://openalex.org/W4383108856",
     //     doi: "https://doi.org/10.1109/icra48891.2023.10161288",
