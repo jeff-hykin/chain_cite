@@ -234,13 +234,13 @@ document.body.animate(...fadeIn)
                     <span style="color: #FFFFFF22;">DOI: ${nodeData.DOI}</span>
                     ${nodeData.title&&html`<h4 style="color: white;font-size: 1.5em;" innerHTML=${nodeData.title}></h4>`}
                     
-                    ${nodeData.authorLastName&&nodeData.yearCreated&&html`
+                    ${nodeData.authorLastName&&nodeData.year&&html`
                         <h5>
                             <a
                                 href=${`https://sci-hub.hkvisa.net/${nodeData.DOI}`}
                                 style="color: ${theme.foregroundDim};text-decoration: underline;font-size: 1rem;"
                                 >
-                                    ${nodeData.authorLastName}, ${nodeData.yearCreated}
+                                    ${nodeData.authorLastName}, ${nodeData.year}
                             </a>
                         </h5>
                     `}
@@ -1012,14 +1012,14 @@ document.body.animate(...fadeIn)
         }
         const paperInfo = await getPaperInfoWrapper(paperOrDoi, { showError: true })
         if (!paperInfo) {
-            return { nodes: [ { id: 0, yearCreated: "Sorry :/", authorLastName: "(not in database)" } ], links: [] }
+            return { nodes: [ { id: 0, year: "Sorry :/", authorLastName: "(not in database)" } ], links: [] }
         }
         
         paperInfo.title = `${paperInfo.title}`||Object.keys(paperInfo).filter(each=>each.match(/.*\btitle\b.*/)).filter(each=>!each.match(/.*\bshort\b.*/)).map(each=>paperInfo[each]).filter(each=>`${each}`)[0]
         try {
-            paperInfo.yearCreated = paperInfo.created["date-parts"][0][0]
+            paperInfo.year = paperInfo.created["date-parts"][0][0]
         } catch (error) {}
-        paperInfo.yearCreated = paperInfo.yearCreated || "[YearCreated Unknown]"
+        paperInfo.year = paperInfo.year || "[Year Unknown]"
         paperInfo.authorLastName = (paperInfo?.author?.length>0 ? paperInfo.author[0].family : "") || "[LastName Unknown]"
         activeNode = paperInfo
         renderNodeSummary(paperInfo)
@@ -1056,9 +1056,9 @@ document.body.animate(...fadeIn)
                 continue
             }
             eachPaper.DOI = eachDoi
-            let yearCreated = ""
+            let year = ""
             try {
-                yearCreated = eachPaper.created["date-parts"][0][0]
+                year = eachPaper.created["date-parts"][0][0]
             } catch (error) {
                 
             }
@@ -1067,7 +1067,7 @@ document.body.animate(...fadeIn)
                 DOI: eachPaper.DOI,
                 title: (eachPaper.title||Object.keys(eachPaper).filter(each=>each.match(/.*\btitle\b.*/)).map(each=>eachPaper[each]).filter(each=>each)[0]),
                 authorLastName: (eachPaper?.author?.length>0 ? eachPaper.author[0].family : ""),
-                yearCreated,
+                year,
                 citedBy: [
                 ],
                 cited: (eachPaper.reference||[]).map(each=>each.DOI).filter(each=>each),
@@ -1191,7 +1191,7 @@ document.body.animate(...fadeIn)
                 .style("stroke", "#aaaaaa50")
                 .style("stroke-width", "4px")
             
-            const years = nodes.map(each=>each.yearCreated).filter(each=>each)
+            const years = nodes.map(each=>each.year).filter(each=>each)
             const largestYear = Math.max(...years)
             const smallestYear = Math.min(...years)
             const yearRange = largestYear-smallestYear
@@ -1214,8 +1214,8 @@ document.body.animate(...fadeIn)
                     if (each.size != null) {
                         return each.size
                     } else {
-                        const normlizedNumber = normalizer(each.yearCreated)
-                        return nodeSize+(35*Math.pow(normalizer(each.yearCreated),1.7))-5
+                        const normlizedNumber = normalizer(each.year)
+                        return nodeSize+(35*Math.pow(normalizer(each.year),1.7))-5
                     }
                 }) 
                 .attr("id", each=>each.id)
@@ -1244,7 +1244,7 @@ document.body.animate(...fadeIn)
                 .data(nodes)
                 .enter().append("text")
                 .text(each=>{
-                    return each.authorLastName||each.yearCreated? `${each.authorLastName||"?"}, ${each.yearCreated||"?"}`:""
+                    return each.authorLastName||each.year? `${each.authorLastName||"?"}, ${each.year||"?"}`:""
                 })
                 .attr("class", "label")
 
