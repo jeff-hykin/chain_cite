@@ -3,6 +3,7 @@
   "redirects": {
     "https://deno.land/x/ensure/mod.ts": "https://deno.land/x/ensure@v1.2.0/mod.ts",
     "https://esm.sh/gh/jeff-hykin/good-js@1.14.3.0/source/flattened/path_pieces_posix.js": "https://esm.sh/gh/jeff-hykin/good-js@40797ac/source/flattened/path_pieces_posix.js",
+    "https://esm.sh/gh/jeff-hykin/good-js@1.14.3.0/source/flattened/to_representation.js": "https://esm.sh/gh/jeff-hykin/good-js@40797ac/source/flattened/to_representation.js",
     "https://esm.sh/gh/jeff-hykin/good-js@1.14.3.0/source/support/posix.js": "https://esm.sh/gh/jeff-hykin/good-js@40797ac/source/support/posix.js"
   },
   "remote": {
@@ -117,8 +118,10 @@
     "https://esm.sh/gh/jeff-hykin/archaeopteryx@1.0.11/denonext/mod.ts.mjs": "22fccffcaab94b338bd207a4dcae5fd23598f4ea51dabcdca458bf20ba6fd259",
     "https://esm.sh/gh/jeff-hykin/archaeopteryx@1.0.11/mod.ts": "a3c4889081c369a4b33b957122741d72f86b6abd522263df333fe99060b6919d",
     "https://esm.sh/gh/jeff-hykin/good-js@40797ac/denonext/source/flattened/path_pieces_posix.mjs": "a144026b6d2f63a0761cbe120c8e5551d610d63c9e7d7912f1056ae5a891a1d1",
+    "https://esm.sh/gh/jeff-hykin/good-js@40797ac/denonext/source/flattened/to_representation.mjs": "872271ebad1af4b4ac66b90291f7a1f7ccd052e22b2cdd28adaee979b7afc4c6",
     "https://esm.sh/gh/jeff-hykin/good-js@40797ac/denonext/source/support/posix.mjs": "2005f6a96005b031c3dbadcbfd36f0b5f6e686627c27d64c4697674b43a0fb3b",
     "https://esm.sh/gh/jeff-hykin/good-js@40797ac/source/flattened/path_pieces_posix.js": "ad98ea5178de29272fb012b42f95d335dd0e0d8ddb4a8facd1d4f8d170d1ba30",
+    "https://esm.sh/gh/jeff-hykin/good-js@40797ac/source/flattened/to_representation.js": "0fdeea37de7b7e7ed15e9314933e89da78ccc3fac0b7314becc1b13d4a314f0a",
     "https://esm.sh/gh/jeff-hykin/good-js@40797ac/source/support/posix.js": "90457b5b9338c65ba4851d850f6e870cca88dcaab97eb4bdf421f8ff562723dc",
     "https://raw.githubusercontent.com/jeff-hykin/archaeopteryx/5152f9a5c6e178cf86b6d82532765ba6d227ec2e/404.ts": "0d0bbe4ae6b8f966b6fe7ac038a88687b25099a754ad8663d9f2db428e1f2240",
     "https://raw.githubusercontent.com/jeff-hykin/archaeopteryx/5152f9a5c6e178cf86b6d82532765ba6d227ec2e/deps.ts": "5ab07dce01612d17d603ed157532faec7848ec261b782ef91a4be010209b75ff",

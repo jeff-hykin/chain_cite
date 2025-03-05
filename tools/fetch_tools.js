@@ -13,7 +13,7 @@ export const jsonFetch = async (url, options)=>{
     }
 }
 
-export const normalizeDoiString = async (doiString)=>{
+export const normalizeDoiString = (doi)=>{
     return doi.replace(/^(https?:\/\/)(doi\.org|dx.doi.org)\/+/,"")
 }
 

@@ -1,4 +1,5 @@
 import { createCachedJsonFetcher, normalizeDoiString } from "./fetch_tools.js"
+import { toRepresentation } from "https://esm.sh/gh/jeff-hykin/good-js@1.14.3.0/source/flattened/to_representation.js"
 
 export const openAlexFetch = createCachedJsonFetcher({
     rateLimit: 1000, // according to their website openAlex rate limit is once per second, and 1000 per day
@@ -6,8 +7,8 @@ export const openAlexFetch = createCachedJsonFetcher({
 }) 
 
 export function openAlexDataFromDoi(doi) {
-    if (!(typeof openAlexId == "string")) {
-        throw Error(`openAlexDataFromDoi(doi), doi arg was not a string`, doi)
+    if (typeof doi != "string") {
+        throw Error(`openAlexDataFromDoi(doi), doi arg was not a string: ${toRepresentation(doi)}`)
     }
     doi = normalizeDoiString(doi)
     // {
@@ -82,8 +83,8 @@ export function openAlexDataFromDoi(doi) {
 }
 
 export async function getLinkedOpenAlexArticles(openAlexId) {
-    if (!(typeof openAlexId == "string")) {
-        throw Error(`getLinkedOpenAlexArticles(openAlexId), openAlexId arg was not a string`, openAlexId)
+    if (typeof openAlexId != "string") {
+        throw Error(`getLinkedOpenAlexArticles(openAlexId), openAlexId arg was not a string: ${toRepresentation(openAlexId)}`)
     }
     // {
     //     "meta": {

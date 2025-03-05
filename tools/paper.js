@@ -1,5 +1,6 @@
 import { MultiSourceObject } from "./multi_source_object.js"
 import { openAlexDataFromDoi, getLinkedOpenAlexArticles, openAlexFetch } from "./open_alex.js"
+import { crossRefDataFromDoi, getLinkedCrossRefArticles, crossRefFetch } from "./cross_ref.js"
 
 
 function openAlexWorkToPaper(each) {
@@ -26,6 +27,20 @@ function openAlexWorkToPaper(each) {
     }
 }
 
+function crossRefWorkToPaper(crossrefData) {
+    return {
+        "doi": crossrefData.DOI,
+        "title": (crossrefData.title||[]).at(-1) || (crossrefData["short-title"]||[]).at(-1),
+        "abstract": (crossrefData.abstract||"")?.replace(/<\/?jats:\w+>/g,"").trim().replace(/^Abstract\b/i,"").trim(),
+        "year": crossrefData?.published?.["date-parts"]?.[0]?.[0] || crossrefData?.issued?.["date-parts"]?.[0]?.[0] || crossrefData?.indexed?.["date-parts"]?.[0]?.[0],
+        "authorNames": crossrefData.author.map(author => author.given + " " + author.family),
+        "url": crossrefData.URL,
+        "pdfUrl": (crossrefData.link||[])?.filter(each=>each.contentType=="application/pdf").map(each=>each.URL)[0],
+        "citationCount": crossrefData["is-referenced-by-count"]-0,
+        "citedDois": (crossrefData.reference||[]).map(each=>each.DOI).filter(each=>each),
+    }
+}
+
 // attempt at common names:
 //    {string} paper.doi - The DOI (Digital Object Identifier) of the paper.
 //    {string} paper.title - The title of the paper.
@@ -45,10 +60,20 @@ export function Paper(sources) {
     return output
 }
 Object.assign(Paper.prototype, {
-    async getConnectedOpenAlexPapers() {
+    getConnectedPapers() {
+        return Promise.all([
+            this._getConnectedOpenAlexPapers(),
+            this._getConnectedCrossRefPapers(),
+        ]).then(result=>result.flat(1))
+    },
+    async _getConnectedOpenAlexPapers() {
         // get alex data if not already there
         if (this.doi && !this.$accordingTo?.openAlex) {
-            this.$accordingTo.openAlex = openAlexWorkToPaper(await openAlexDataFromDoi(this.doi))
+            try {
+                this.$accordingTo.openAlex = openAlexWorkToPaper(await openAlexDataFromDoi(this.doi))
+            } catch (error) {
+                
+            }
         }
         // get connected papers using alex data
         if (this.$accordingTo?.openAlex?.id) {
@@ -58,6 +83,25 @@ Object.assign(Paper.prototype, {
                 this.$accordingTo.openAlex.citedBy = citedBy.map(openAlexWorkToPaper)
             }
             return [...this.$accordingTo.openAlex.cites, ...this.$accordingTo.openAlex.citedBy]
+        }
+        // on fail, return null
+    },
+    async _getConnectedCrossRefPapers() {
+        // get alex data if not already there
+        if (this.doi && !this.$accordingTo?.crossRef?.citedDois) {
+            try {
+                this.$accordingTo.crossRef = crossRefWorkToPaper(await crossRefDataFromDoi(this.doi))
+            } catch (error) {
+                
+            }
+        }
+        // get connected papers using alex data
+        if (this.doi && this.$accordingTo?.crossRef?.citedDois instanceof Array) {
+            if (!(this.$accordingTo?.crossRef?.cites instanceof Array)) {
+                const {cites} = await getLinkedCrossRefArticles(this.doi)
+                this.$accordingTo.crossRef.cites = cites.map(crossRefWorkToPaper)
+            }
+            return this.$accordingTo?.crossRef.cites
         }
         // on fail, return null
     },

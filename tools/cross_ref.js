@@ -1,4 +1,5 @@
 import { createCachedJsonFetcher, normalizeDoiString } from "./fetch_tools.js"
+import { toRepresentation } from "https://esm.sh/gh/jeff-hykin/good-js@1.14.3.0/source/flattened/to_representation.js"
 
 export const crossRefFetch = createCachedJsonFetcher({
     rateLimit: 100, // not sure what their rate limit is
@@ -6,9 +7,9 @@ export const crossRefFetch = createCachedJsonFetcher({
 }) 
 
 
-export function crossRefDataFromDoi(doi) {
-    if (!(typeof doi == "string")) {
-        throw Error(`crossRefDataFromDoi(doi), doi arg was not a string`, doi)
+export async function crossRefDataFromDoi(doi) {
+    if (typeof doi != "string") {
+        throw Error(`crossRefDataFromDoi(doi), doi arg was not a string: ${toRepresentation(doi)}`)
     }
     doi = normalizeDoiString(doi)
     return (await crossRefFetch(`https://api.crossref.org/works/${doi}`)).message
@@ -666,13 +667,13 @@ export function crossRefDataFromDoi(doi) {
     // }
 }
 
-async function getLinkedCrossRefArticles(doi) {
-    if (!(typeof doi == "string")) {
-        throw Error(`getLinkedCrossRefArticles(doi), doi arg was not a string`, doi)
+export async function getLinkedCrossRefArticles(doi) {
+    if (typeof doi != "string") {
+        throw Error(`getLinkedCrossRefArticles(doi), doi arg was not a string: ${toRepresentation(doi)}`)
     }
     const crossRefObject = await crossRefDataFromDoi(doi)
     
-    const refs = (paperInfo?.reference||[]).map(each=>each.DOI).filter(each=>each).slice(0)
+    const dois = (crossRefObject?.reference||[]).map(each=>each.DOI).filter(each=>each)
     // [
     //     {
     //         "issue": "4",
@@ -1061,12 +1062,10 @@ async function getLinkedCrossRefArticles(doi) {
     //         "DOI": "10.1097/00004872-200309000-00019"
     //     }
     // ]
-    if (refs.length == 0) {
+    if (dois.length == 0) {
         return { cites: [] }
     } else {
-        const refsWithDois = refs.filter(each=>each.DOI)
-        const dois = refsWithDois.map(each=>each.DOI)
-        const allRefs = await crossRefFetch(`https://api.crossref.org/works/?filter=${dois.map(eachDoi=>`doi:${eachDoi}`).join(",")}&rows=${dois.length}`)
-        return { cites: allRefs }
+        const result = await crossRefFetch(`https://api.crossref.org/works/?filter=${dois.map(eachDoi=>`doi:${eachDoi}`).join(",")}&rows=${dois.length}`)
+        return { cites: result?.message?.items||[] }
     }
 }
