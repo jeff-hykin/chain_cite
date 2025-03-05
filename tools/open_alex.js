@@ -21549,8 +21549,10 @@ export async function getLinkedOpenAlexArticles(openAlexId) {
     //     ],
     //     "group_by": []
     // }
+    const results = (await openAlexFetch(`https://api.openalex.org/works?filter=cited_by:${openAlexId},cites:${openAlexId}`)).results
+    
     return {
-        citedBy: (await openAlexFetch(`https://api.openalex.org/works?filter=cited_by:${openAlexId}`)).results,
-        cites: (await openAlexFetch(`https://api.openalex.org/works?filter=cites:${openAlexId}`)).results,
+        citedBy: results.filter(each=>each.referenced_works.includes(`https://openalex.org/${openAlexId}`)),
+        cites: results.filter(each=>!each.referenced_works.includes(`https://openalex.org/${openAlexId}`)),
     }
 }
